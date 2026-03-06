@@ -1,0 +1,27 @@
+# Data and binaries
+*.xlsx
+*.xls
+*.parquet
+*.csv
+*.exe
+
+# Outputs
+output/
+persona_output/
+segplus_output/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Env
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+Claude code/
+data/*
+!data/.gitkeep

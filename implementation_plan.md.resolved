@@ -1,0 +1,131 @@
+# Financial Services Client Segmentation & GenAI Persona Generation
+
+Build a complete pipeline that generates synthetic financial client data, segments clients using clustering algorithms, and generates rich customer personas using Generative AI (Google Gemini).
+
+## Proposed Changes
+
+### 1. Synthetic Data Generation
+
+#### [NEW] [generate_data.py](file:///c:/Users/UmairAhmed/OneDrive%20-%20Blend%20360/Documents/Segmentation_Plus/generate_data.py)
+
+Generate **2,000 synthetic client records** with realistic financial services attributes:
+
+| Category | Fields |
+|---|---|
+| **Demographics** | `client_id`, `age`, `gender`, `income`, `education`, `marital_status`, `dependents`, `occupation` |
+| **Financial Profile** | `account_balance`, `credit_score`, `monthly_spending`, `savings_rate`, `debt_to_income_ratio`, `investment_portfolio_value` |
+| **Product Holdings** | `has_credit_card`, `has_mortgage`, `has_personal_loan`, `has_investment_account`, `has_insurance`, `num_products` |
+| **Behavioral** | `digital_engagement_score`, `branch_visits_monthly`, `customer_tenure_years`, `transaction_frequency_monthly`, `avg_transaction_amount` |
+| **Satisfaction** | `nps_score`, `complaint_count_yearly`, `churn_risk_score` |
+
+Data will be generated using `numpy` and `pandas` with correlated distributions (e.g., higher income → higher portfolio value, younger age → higher digital engagement).
+
+---
+
+### 2. EDA & Preprocessing
+
+#### [NEW] [eda_preprocessing.py](file:///c:/Users/UmairAhmed/OneDrive%20-%20Blend%20360/Documents/Segmentation_Plus/eda_preprocessing.py)
+
+- Summary statistics and distribution plots for each feature
+- Correlation heatmap across all numerical features
+- Missing value analysis (none expected, but included for robustness)
+- Feature scaling using `StandardScaler`
+- Dimensionality reduction with PCA for visualization
+- Export preprocessed data to `data/processed_clients.csv`
+
+---
+
+### 3. Clustering & Segmentation
+
+#### [NEW] [clustering.py](file:///c:/Users/UmairAhmed/OneDrive%20-%20Blend%20360/Documents/Segmentation_Plus/clustering.py)
+
+- **K-Means Clustering** with Elbow Method and Silhouette Score to find optimal K
+- **DBSCAN** as alternative density-based method
+- **Hierarchical Clustering** with dendrogram visualization
+- Cluster profiling: aggregate statistics per cluster (mean income, avg products, etc.)
+- Radar charts and box plots per cluster
+- Export cluster assignments back to the dataset
+
+---
+
+### 4. GenAI Persona Generation
+
+#### [NEW] [persona_generation.py](file:///c:/Users/UmairAhmed/OneDrive%20-%20Blend%20360/Documents/Segmentation_Plus/persona_generation.py)
+
+Uses **Google Gemini API** to generate rich marketing personas for each cluster:
+
+- Summarize each cluster's statistical profile into a prompt
+- Send structured prompts to Gemini asking for:
+  - Persona name and demographic snapshot
+  - Financial goals and pain points
+  - Preferred products and services
+  - Communication channel preferences
+  - Marketing strategy recommendations
+- Parse and format the AI-generated personas
+- Save output as `output/personas.md` and `output/personas.json`
+
+> [!IMPORTANT]
+> **API Key required**: You'll need a Google Gemini API key. The script will read it from the environment variable `GOOGLE_API_KEY`. Please have your key ready, or let me know if you'd prefer a different GenAI provider (OpenAI, Azure, etc.).
+
+---
+
+### 5. Visualization Dashboard
+
+#### [NEW] [dashboard.py](file:///c:/Users/UmairAhmed/OneDrive%20-%20Blend%20360/Documents/Segmentation_Plus/dashboard.py)
+
+An interactive **Plotly** dashboard (HTML output) combining:
+
+- PCA scatter plot colored by cluster
+- Cluster size distribution (bar chart)
+- Feature distributions per cluster (violin plots)
+- Radar chart of cluster profiles
+- Persona cards rendered as styled HTML
+
+---
+
+### 6. Project Configuration
+
+#### [NEW] [requirements.txt](file:///c:/Users/UmairAhmed/OneDrive%20-%20Blend%20360/Documents/Segmentation_Plus/requirements.txt)
+
+```
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+plotly
+google-generativeai
+```
+
+#### [NEW] [main.py](file:///c:/Users/UmairAhmed/OneDrive%20-%20Blend%20360/Documents/Segmentation_Plus/main.py)
+
+Orchestrator script that runs the full pipeline end-to-end:
+1. Generate data → 2. EDA & preprocess → 3. Cluster → 4. Generate personas → 5. Build dashboard
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+1. **Data generation validity**:
+   ```
+   python -c "import pandas as pd; df=pd.read_csv('data/synthetic_clients.csv'); assert len(df)==2000; assert df.isnull().sum().sum()==0; print('✓ Data OK')"
+   ```
+
+2. **Clustering output check**:
+   ```
+   python -c "import pandas as pd; df=pd.read_csv('data/clustered_clients.csv'); assert 'cluster' in df.columns; print(f'✓ {df.cluster.nunique()} clusters found')"
+   ```
+
+3. **Full pipeline run**:
+   ```
+   python main.py
+   ```
+   Expected: All output files generated in `data/` and `output/` directories without errors.
+
+### Manual Verification
+
+- Review generated charts in `output/` folder for visual correctness
+- Read persona output in `output/personas.md` for quality and relevance
+- Open `output/dashboard.html` in a browser to verify interactivity

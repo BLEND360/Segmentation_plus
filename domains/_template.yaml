@@ -1,0 +1,51 @@
+# Domain Configuration Template
+# Copy this file and customize for your domain.
+
+domain: my_domain
+display_name: "My Domain"
+
+required_columns:
+  - customer_id
+
+features:
+  demographics: []
+  # Add your feature groups here:
+  # financial: [col1, col2]
+  # behavioral: [col3, col4]
+
+categorical_columns: []
+
+scaling_exclude:
+  - customer_id
+
+feature_engineering: []
+  # - name: derived_feature
+  #   formula: "col1 * col2"
+  #   description: "Description of what this feature captures"
+
+eda:
+  domain_analyses: []
+  # - my_custom_analysis
+
+persona_prompt_template: |
+  You are a marketing strategist advising a company on their customer segments.
+
+  Segment {segment_id} Profile:
+  {segment_stats}
+
+  Top SHAP Feature Drivers:
+  {shap_drivers}
+
+  Generate a detailed customer persona with:
+  1. Persona Name
+  2. One-Line Description
+  3. Demographics & Lifestyle
+  4. Goals
+  5. Pain Points
+  6. Product Recommendations
+  7. Preferred Channels
+  8. Marketing Strategy
+
+  Output as structured JSON.
+
+metadata: {}

@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Segmentation Plus — Detailed Technical Guide</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1117;
+            --card: #1e2233;
+            --border: #2d3348;
+            --t1: #e8eaf0;
+            --t2: #9ca3b8;
+            --t3: #6b7189;
+            --blue: #5b8def;
+            --purple: #a78bfa;
+            --green: #34d399;
+            --orange: #fb923c;
+            --pink: #f472b6;
+            --red: #f87171;
+            --cyan: #22d3ee
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--t1);
+            line-height: 1.75;
+            -webkit-font-smoothing: antialiased
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1a1040, #0f1117 40%, #0a1628);
+            padding: 60px 50px 45px;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(91, 141, 239, .12), transparent 70%);
+            pointer-events: none
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 20px;
+            background: rgba(91, 141, 239, .15);
+            border: 1px solid rgba(91, 141, 239, .3);
+            color: var(--blue);
+            font-size: .73rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 14px
+        }
+
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #5b8def, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+            line-height: 1.2
+        }
+
+        .hero p {
+            font-size: 1rem;
+            color: var(--t2);
+            max-width: 750px
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+            padding: 32px 36px 70px
+        }
+
+        .step {
+            margin-bottom: 56px
+        }
+
+        .step-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 18px
+        }
+
+        .step-num {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 800;
+            flex-shrink: 0;
+            color: #fff
+        }
+
+        .step h2 {
+            font-size: 1.4rem;
+            font-weight: 700
+        }
+
+        .step h2 span {
+            display: block;
+            font-size: .78rem;
+            font-weight: 500;
+            color: var(--t3);
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: .8px
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0
+        }
+
+        .col-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 22px 24px
+        }
+
+        .col-card h3 {
+            font-size: .85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px
+        }
+
+        .col-card h3.concept {
+            color: var(--cyan)
+        }
+
+        .col-card h3.tech {
+            color: var(--orange)
+        }
+
+        .col-card ul {
+            padding-left: 18px;
+            color: var(--t2);
+            font-size: .88rem
+        }
+
+        .col-card ul li {
+            margin-bottom: 6px
+        }
+
+        .col-card p {
+            color: var(--t2);
+            font-size: .88rem
+        }
+
+        .mw {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px 18px;
+            margin: 16px 0;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 22px 24px;
+            margin: 14px 0
+        }
+
+        .card h3 {
+            font-size: .95rem;
+            font-weight: 600;
+            margin-bottom: 10px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .83rem
+        }
+
+        thead {
+            background: rgba(91, 141, 239, .08)
+        }
+
+        th {
+            text-align: left;
+            padding: 9px 13px;
+            font-weight: 600;
+            color: var(--blue);
+            border-bottom: 1px solid var(--border);
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: .7px
+        }
+
+        td {
+            padding: 9px 13px;
+            border-bottom: 1px solid rgba(45, 51, 72, .5);
+            color: var(--t2);
+            vertical-align: top
+        }
+
+        tr:last-child td {
+            border-bottom: none
+        }
+
+        td code,
+        p code {
+            background: rgba(91, 141, 239, .1);
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .78rem;
+            color: var(--blue)
+        }
+
+        .cb {
+            background: #12141c;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 20px;
+            overflow-x: auto;
+            margin: 12px 0
+        }
+
+        .cb pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .78rem;
+            color: #b8c4d8;
+            line-height: 1.7;
+            white-space: pre
+        }
+
+        .hbox {
+            border-left: 3px solid var(--green);
+            border-radius: 0 10px 10px 0;
+            padding: 14px 20px;
+            margin: 14px 0;
+            font-size: .86rem;
+            color: var(--t2)
+        }
+
+        .hbox.blue {
+            background: rgba(91, 141, 239, .06);
+            border-left-color: var(--blue)
+        }
+
+        .hbox.orange {
+            background: rgba(251, 146, 60, .06);
+            border-left-color: var(--orange)
+        }
+
+        .hbox.green {
+            background: rgba(52, 211, 153, .06);
+            border-left-color: var(--green)
+        }
+
+        .hbox.purple {
+            background: rgba(167, 139, 250, .06);
+            border-left-color: var(--purple)
+        }
+
+        .hbox strong {
+            color: var(--t1)
+        }
+
+        .math {
+            background: rgba(167, 139, 250, .06);
+            border: 1px solid rgba(167, 139, 250, .2);
+            border-radius: 8px;
+            padding: 12px 18px;
+            margin: 10px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82rem;
+            color: var(--purple);
+            text-align: center
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 44px 0
+        }
+
+        .footer {
+            text-align: center;
+            padding: 32px 20px;
+            border-top: 1px solid var(--border);
+            color: var(--t3);
+            font-size: .76rem
+        }
+
+        @media(max-width:768px) {
+            .hero {
+                padding: 30px 18px
+            }
+
+            .hero h1 {
+                font-size: 1.6rem
+            }
+
+            .container {
+                padding: 18px 14px
+            }
+
+            .two-col {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                color: #1a1d27
+            }
+
+            .hero {
+                background: #f0f2f8
+            }
+
+            .hero h1 {
+                -webkit-text-fill-color: #1a1d27
+            }
+
+            .col-card,
+            .mw,
+            .card,
+            .cb {
+                border-color: #ddd;
+                background: #fafbfc
+            }
+
+            th {
+                color: #1a1d27
+            }
+
+            td,
+            .hero p,
+            p,
+            ul li {
+                color: #444
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hero">
+        <div class="badge">Detailed Technical Guide</div>
+        <h1>Segmentation Plus — Step-by-Step</h1>
+        <p>Deep-dive into each pipeline step: the conceptual "why" and the technical "how" behind domain configuration,
+            EDA, clustering, evaluation, and GenAI persona generation.</p>
+    </div>
+
+    <div class="container">
+
+        <!-- ============ STEP 1 ============ -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num" style="background:#607D8B;">1</div>
+                <h2>Domain Configuration <span>Foundation Layer</span></h2>
+            </div>
+
+            <div class="two-col">
+                <div class="col-card">
+                    <h3 class="concept">💡 Conceptual — Why?</h3>
+                    <p>Different industries have fundamentally different customer attributes and business questions. A
+                        bank cares about credit risk and product cross-sell; a retailer about purchase frequency and
+                        basket size. Rather than building separate systems, we use a <strong>configuration-driven
+                            architecture</strong> — one engine, many domains.</p>
+                    <ul>
+                        <li>Eliminates code duplication across client engagements</li>
+                        <li>New domains added by creating a YAML file, not writing new code</li>
+                        <li>Ensures consistency in methodology across all domains</li>
+                    </ul>
+                </div>
+                <div class="col-card">
+                    <h3 class="tech">⚙️ Technical — How?</h3>
+                    <p>Each domain is defined in a <code>domains/*.yaml</code> file containing:</p>
+                    <ul>
+                        <li><strong>Feature schema</strong> — required columns, data types, valid ranges</li>
+                        <li><strong>EDA rules</strong> — which domain-specific analyses to run</li>
+                        <li><strong>Feature engineering recipes</strong> — computed columns, ratios, derived scores</li>
+                        <li><strong>Persona prompt template</strong> — domain-specific GenAI instructions</li>
+                        <li><strong>Synthetic data distributions</strong> — realistic parameter ranges for demo
+                            generation</li>
+                    </ul>
+                    <p><code>config.py</code> loads the YAML at pipeline start and injects the domain context into every
+                        downstream module via a <code>DomainConfig</code> dataclass.</p>
+                </div>
+            </div>
+
+            <div class="cb">
+                <pre># domains/financial_services.yaml (simplified)
+domain: financial_services
+display_name: "Financial Services"
+
+features:
+  demographics: [age, gender, annual_income, education, occupation]
+  financial: [credit_score, account_balance, portfolio_value, debt_to_income]
+  products: [has_mortgage, has_credit_card, has_investment_account]
+  behavioral: [digital_engagement, branch_visits, transaction_frequency]
+  satisfaction: [nps_score, churn_risk_score]
+
+feature_engineering:
+  - name: wealth_tier
+    formula: "annual_income * portfolio_value"
+    bins: [low, medium, high, ultra_high]
+  - name: digital_ratio
+    formula: "digital_engagement / (digital_engagement + branch_visits)"
+
+eda:
+  domain_analyses:
+    - income_vs_credit_risk
+    - product_cross_holdings_matrix
+    - high_value_customer_identification
+
+persona_prompt_template: |
+  You are advising a {institution_type} on their customer segments...</pre>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- ============ STEP 2 ============ -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num" style="background:#4CAF50;">2</div>
+                <h2>Data Input Layer <span>Synthetic Generation + Real Data Import</span></h2>
+            </div>
+
+            <div class="two-col">
+                <div class="col-card">
+                    <h3 class="concept">💡 Conceptual — Why?</h3>
+                    <ul>
+                        <li><strong>Synthetic data</strong> enables POC/demo without waiting for real client data —
+                            critical for fast sales cycles and internal showcases</li>
+                        <li><strong>Real data import</strong> is the production path — when a client provides their
+                            actual customer data, the same pipeline processes it without code changes</li>
+                        <li>Synthetic data is generated with <strong>realistic correlations</strong> (e.g., higher
+                            income → higher portfolio value → higher credit score) so the downstream clustering produces
+                            meaningful segments even in demo mode</li>
+                    </ul>
+                </div>
+                <div class="col-card">
+                    <h3 class="tech">⚙️ Technical — How?</h3>
+                    <p><strong>Synthetic generation</strong> (<code>generate_data.py</code>):</p>
+                    <ul>
+                        <li>Uses <code>numpy.random</code> with multivariate normal distributions to create correlated
+                            features</li>
+                        <li>Categorical features sampled via weighted <code>np.random.choice</code></li>
+                        <li>Domain config defines realistic ranges (e.g., credit_score: 300–850, age: 18–80)</li>
+                    </ul>
+                    <p><strong>Real data import</strong> (<code>data_import.py</code>):</p>
+                    <ul>
+                        <li>Schema validation against domain YAML — checks required columns, types, ranges</li>
+                        <li>Automatic column mapping (fuzzy matching for similar column names)</li>
+                        <li>Outputs standardized DataFrame regardless of input source (CSV, SQL, API)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="math">Synthetic correlation: X ~ 𝒩(μ, Σ) where Σ encodes realistic inter-feature correlations
+            </div>
+
+            <div class="hbox blue"><strong>Key design principle:</strong> The pipeline is <em>data-source agnostic</em>
+                — once data passes the schema validator, every downstream step works identically whether the data is
+                synthetic or real.</div>
+        </div>
+
+        <hr>
+
+        <!-- ============ STEP 3 ============ -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num" style="background:#2196F3;">3</div>
+                <h2>Domain-Aware EDA & Feature Engineering <span>Understanding + Transforming the Data</span></h2>
+            </div>
+
+            <div class="two-col">
+                <div class="col-card">
+                    <h3 class="concept">💡 Conceptual — Why?</h3>
+                    <p>EDA tells us <strong>what patterns exist</strong> in the data before we cluster. Without EDA,
+                        we're clustering blindly — and bad features produce bad segments.</p>
+                    <ul>
+                        <li><strong>Generic EDA</strong> — distributions, correlations, outliers, missing values.
+                            Applied to every domain uniformly.</li>
+                        <li><strong>Domain-specific EDA</strong> — analyses that only make sense in context. Example:
+                            RFM analysis is meaningless for healthcare but critical for retail.</li>
+                        <li><strong>Feature engineering</strong> creates new variables that capture business logic
+                            (e.g., wealth_tier = income × portfolio) and improve clustering quality.</li>
+                    </ul>
+                </div>
+                <div class="col-card">
+                    <h3 class="tech">⚙️ Technical — How?</h3>
+                    <p><strong>Generic EDA</strong> (always runs):</p>
+                    <ul>
+                        <li>Distribution histograms + KDE plots (<code>seaborn.histplot</code>)</li>
+                        <li>Pearson correlation matrix heatmap</li>
+                        <li>Box plots for outlier detection (IQR method)</li>
+                        <li>Missing value matrix (<code>missingno</code> pattern)</li>
+                    </ul>
+                    <p><strong>Domain-specific EDA</strong> (from YAML config):</p>
+                    <ul>
+                        <li>FS: Income decile analysis, credit score vs. product count scatter</li>
+                        <li>Retail: Recency-Frequency-Monetary (RFM) scoring matrix</li>
+                        <li>Healthcare: Risk stratification pyramid, utilization heatmap</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Feature Engineering Pipeline</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stage</th>
+                            <th>What It Does</th>
+                            <th>Method</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1. Domain features</strong></td>
+                            <td>Create business-meaningful derived columns</td>
+                            <td>Formulas from YAML config (ratios, tiers, scores)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2. Encoding</strong></td>
+                            <td>Convert categorical to numerical</td>
+                            <td>One-hot encoding (<code>pd.get_dummies</code>) or Label encoding</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3. Outlier handling</strong></td>
+                            <td>Cap extreme values</td>
+                            <td>Winsorization at 1st/99th percentile</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4. Scaling</strong></td>
+                            <td>Normalize all features to same scale</td>
+                            <td><code>StandardScaler</code> → mean=0, std=1 (critical for distance-based algorithms)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>5. Dimensionality reduction</strong></td>
+                            <td>Reduce feature space for visualization</td>
+                            <td>PCA — retain components explaining ≥85% variance</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="hbox orange"><strong>Why StandardScaler matters:</strong> K-Means and DBSCAN use Euclidean
+                distance. Without scaling, a feature like income (range: $20K–$500K) would dominate over credit_score
+                (range: 300–850) simply due to magnitude, not importance.</div>
+        </div>
+
+        <hr>
+
+        <!-- ============ STEP 4 ============ -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num" style="background:#FF9800;">4</div>
+                <h2>Clustering Algorithms <span>Segmenting the Customer Base</span></h2>
+            </div>
+
+            <div class="two-col">
+                <div class="col-card">
+                    <h3 class="concept">💡 Conceptual — Why 3 algorithms?</h3>
+                    <p>No single clustering algorithm works best for all data shapes. We run three complementary
+                        approaches and compare:</p>
+                    <ul>
+                        <li><strong>K-Means</strong> — fast, interpretable, assumes spherical clusters. Good baseline.
+                        </li>
+                        <li><strong>DBSCAN</strong> — finds arbitrarily-shaped clusters and detects noise/outliers.
+                            Great when some customers don't fit any group.</li>
+                        <li><strong>GMM</strong> — probabilistic (soft) assignment. Each customer gets a probability of
+                            belonging to each cluster. Handles elliptical shapes and correlated features.</li>
+                    </ul>
+                </div>
+                <div class="col-card">
+                    <h3 class="tech">⚙️ Technical — How?</h3>
+                    <p>All algorithms operate on the <strong>scaled, engineered feature matrix</strong> from Step 3.</p>
+                    <ul>
+                        <li>Algorithms from <code>scikit-learn</code>: <code>KMeans</code>, <code>DBSCAN</code>,
+                            <code>GaussianMixture</code></li>
+                        <li>We vary hyperparameters and pick the best model via evaluation metrics (Step 5)</li>
+                        <li>GMM additionally outputs <code>predict_proba()</code> — a probability matrix showing each
+                            customer's likelihood per segment</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Algorithm Deep-Dive</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Algorithm</th>
+                            <th>How It Works</th>
+                            <th>Key Hyperparameter</th>
+                            <th>Best For</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>K-Means</strong></td>
+                            <td>1. Place K random centroids<br>2. Assign each point to nearest centroid<br>3. Recompute
+                                centroids as cluster means<br>4. Repeat until convergence</td>
+                            <td><code>n_clusters</code> (K) — found via Elbow/Silhouette</td>
+                            <td>Well-separated, roughly equal-size, spherical clusters</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DBSCAN</strong></td>
+                            <td>1. For each point, count neighbors within radius ε<br>2. Points with ≥ min_samples
+                                neighbors are "core points"<br>3. Expand clusters from core points<br>4. Unlabeled
+                                points become noise (-1)</td>
+                            <td><code>eps</code> (radius) + <code>min_samples</code> — found via k-distance plot</td>
+                            <td>Irregular shapes, noisy data, unknown number of clusters</td>
+                        </tr>
+                        <tr>
+                            <td><strong>GMM</strong></td>
+                            <td>1. Assume data comes from K Gaussian distributions<br>2. EM algorithm: E-step assigns
+                                soft probabilities, M-step updates Gaussian parameters<br>3. Iterate until
+                                log-likelihood converges<br>4. Each point gets probability per cluster</td>
+                            <td><code>n_components</code> — found via BIC/AIC</td>
+                            <td>Correlated features, overlapping clusters, soft assignment needed</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="math">K-Means objective: minimize J = Σᵢ Σₓ∈Cᵢ ||x - μᵢ||² (within-cluster sum of squares =
+                Inertia)</div>
+            <div class="math">GMM: P(x) = Σₖ πₖ · 𝒩(x | μₖ, Σₖ) — mixture of K Gaussians with weights πₖ</div>
+
+            <div class="hbox purple"><strong>Why GMM over Hierarchical?</strong> GMM gives <em>soft assignments</em>
+                (e.g., "Customer X is 70% Segment A, 30% Segment B") — ideal for marketing where customers often sit
+                between segments. GMM also handles correlated features via full covariance matrices, and BIC/AIC provide
+                principled model selection vs. subjective dendrogram cutting.</div>
+        </div>
+
+        <hr>
+
+        <!-- ============ STEP 5 ============ -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num" style="background:#F44336;">5</div>
+                <h2>Cluster Evaluation Framework <span>Validating Segment Quality</span></h2>
+            </div>
+
+            <div class="two-col">
+                <div class="col-card">
+                    <h3 class="concept">💡 Conceptual — Why?</h3>
+                    <p>Clustering is <strong>unsupervised</strong> — there's no ground truth to check against.
+                        Evaluation ensures our segments are:</p>
+                    <ul>
+                        <li><strong>Optimal K</strong> — not too few (overgeneralized) or too many (noise)</li>
+                        <li><strong>Well-separated</strong> — customers within a cluster are similar; customers across
+                            clusters are different</li>
+                        <li><strong>Interpretable</strong> — we can explain what drives each segment</li>
+                        <li><strong>Stable</strong> — segments persist if we resample the data</li>
+                    </ul>
+                </div>
+                <div class="col-card">
+                    <h3 class="tech">⚙️ Technical — How?</h3>
+                    <p>Four-step evaluation pipeline, each step uses different techniques:</p>
+                    <ul>
+                        <li><strong>Step 5a:</strong> Inertia elbow + BIC/AIC + Silhouette sweeps</li>
+                        <li><strong>Step 5b:</strong> Quality scores (Silhouette, Davies-Bouldin, Calinski-Harabasz)
+                        </li>
+                        <li><strong>Step 5c:</strong> PCA loadings + SHAP + cluster profiles</li>
+                        <li><strong>Step 5d:</strong> Bootstrap resampling + GMM probability confidence</li>
+                    </ul>
+                    <p>All implemented in <code>cluster_evaluation.py</code> using <code>scikit-learn</code> metrics and
+                        <code>shap</code> library.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>5a · Finding Optimal K</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>What It Does</th>
+                            <th>How to Read</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Inertia / Elbow</strong></td>
+                            <td>Plots within-cluster sum of squares (WCSS) vs. K. As K increases, inertia decreases —
+                                but at diminishing returns.</td>
+                            <td>Look for the "elbow" — the K where the curve bends sharply. Beyond that, adding clusters
+                                gives little improvement.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>BIC / AIC</strong></td>
+                            <td>Bayesian/Akaike Information Criterion — penalizes model complexity. Used for GMM
+                                specifically.</td>
+                            <td>Pick the K where BIC/AIC is <em>minimized</em>. BIC penalizes complexity more than AIC,
+                                so it tends to prefer fewer clusters.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Silhouette vs K</strong></td>
+                            <td>Computes silhouette score for each K. Measures how similar each point is to its own
+                                cluster vs. nearest neighbor cluster.</td>
+                            <td>Pick K with the <em>highest</em> average silhouette. Range: -1 (wrong cluster) to +1
+                                (perfect fit).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="math">Silhouette(i) = (b(i) - a(i)) / max(a(i), b(i))<br>where a(i) = avg distance to
+                same-cluster points, b(i) = avg distance to nearest-other-cluster points</div>
+
+            <div class="card">
+                <h3>5b · Cluster Quality Metrics</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Formula Intuition</th>
+                            <th>Ideal Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Silhouette Score</strong></td>
+                            <td>How well each point fits its cluster vs. the next-best cluster</td>
+                            <td>Closer to +1 (≥0.5 is good, ≥0.7 is strong)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Davies-Bouldin Index</strong></td>
+                            <td>Ratio of within-cluster scatter to between-cluster separation. Lower = tighter, more
+                                separated clusters.</td>
+                            <td>Closer to 0</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Calinski-Harabasz</strong></td>
+                            <td>Ratio of between-cluster variance to within-cluster variance (like an F-statistic for
+                                clusters)</td>
+                            <td>Higher = better defined clusters</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>5c · Interpretability: PCA Loadings + SHAP</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>What It Answers</th>
+                            <th>Technical Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>PCA Loadings</strong></td>
+                            <td>Which original features drive each principal component?</td>
+                            <td>The loading matrix shows how much each original feature contributes to each PC. A
+                                heatmap of loadings reveals feature groupings. E.g., if PC1 has high loadings for
+                                income, portfolio_value, and credit_score — PC1 represents "wealth". Clusters separated
+                                along PC1 are primarily differentiated by wealth.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SHAP Summary</strong></td>
+                            <td>Which features are most important for distinguishing clusters? Why is a specific
+                                customer in a specific cluster?</td>
+                            <td>Train a <code>RandomForestClassifier</code> on <code>cluster_label</code> as target. Use
+                                <code>shap.TreeExplainer</code> to compute SHAP values. Summary beeswarm plot shows
+                                global feature importance. Per-cluster bar plots show what defines each segment. Force
+                                plots explain individual customer assignments.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cluster Profiles</strong></td>
+                            <td>What does each cluster "look like" statistically?</td>
+                            <td>Compute mean/median of every feature per cluster. Visualize as radar charts (comparing
+                                clusters on key dimensions) and violin/box plots (distribution of each feature per
+                                cluster).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="hbox green"><strong>PCA Loadings vs. SHAP — when to use which?</strong><br>
+                • <strong>PCA Loadings</strong> answer: "What features vary together in the data?" — useful for
+                <em>understanding data structure</em> before clustering.<br>
+                • <strong>SHAP</strong> answers: "What features distinguish the clusters we found?" — useful for
+                <em>explaining cluster assignments</em> after clustering.<br>
+                Both are needed: PCA loadings validate that clustering operates on meaningful dimensions; SHAP validates
+                that the resulting segments are interpretable.</div>
+
+            <div class="card">
+                <h3>5d · Stability Testing</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>How It Works</th>
+                            <th>What It Proves</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Bootstrap Resampling</strong></td>
+                            <td>Resample the dataset with replacement N times (e.g., 100), re-cluster each time, and
+                                measure agreement using the Adjusted Rand Index (ARI) between the original and resampled
+                                clusters.</td>
+                            <td>If ARI is consistently high (≥0.8), the segments are robust — they aren't just artifacts
+                                of the specific data sample.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>GMM Probability Distribution</strong></td>
+                            <td>Plot a histogram of each customer's max assignment probability from GMM.</td>
+                            <td>If most customers have max-prob ≥0.8, the segments are clearly defined. A flat
+                                distribution means ambiguous assignments — clusters may be overlapping or poorly
+                                separated.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- ============ STEP 6 ============ -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num" style="background:#9C27B0;">6</div>
+                <h2>GenAI Persona Generation <span>Turning Segments into Narratives</span></h2>
+            </div>
+
+            <div class="two-col">
+                <div class="col-card">
+                    <h3 class="concept">💡 Conceptual — Why?</h3>
+                    <p>Cluster labels ("Segment 1, 2, 3…") are meaningless to business stakeholders. Marketing teams
+                        need <strong>personas</strong> — named, narrative profiles that bring segments to life.</p>
+                    <ul>
+                        <li>A persona bridges the gap between <em>statistical output</em> and <em>actionable
+                                strategy</em></li>
+                        <li>GenAI (Gemini) transforms cluster statistics + SHAP drivers into natural-language personas
+                            with goals, pain points, and recommendations</li>
+                        <li>Domain-aware prompts ensure personas are contextually relevant (banking language for FS,
+                            shopping language for retail)</li>
+                    </ul>
+                </div>
+                <div class="col-card">
+                    <h3 class="tech">⚙️ Technical — How?</h3>
+                    <ol style="padding-left:18px;color:var(--t2);font-size:.88rem">
+                        <li>Aggregate cluster statistics: mean of every feature per cluster</li>
+                        <li>Extract top 5 SHAP drivers per cluster (features that most define the segment)</li>
+                        <li>Load domain-specific prompt template from YAML config</li>
+                        <li>Inject cluster stats + SHAP drivers into the template</li>
+                        <li>Call <code>google.generativeai.GenerativeModel('gemini-pro')</code></li>
+                        <li>Parse the structured response (name, goals, pain points, strategy)</li>
+                        <li>Save to <code>personas.json</code> (machine-readable) and <code>personas.md</code>
+                            (human-readable)</li>
+                    </ol>
+                    <p style="margin-top:8px">Uses <code>google-generativeai</code> SDK. API key read from
+                        <code>GOOGLE_API_KEY</code> env var.</p>
+                </div>
+            </div>
+
+            <div class="hbox purple"><strong>Why SHAP drivers in the prompt?</strong> Without SHAP, the GenAI model only
+                sees averages (e.g., "Avg Income: $125K"). With SHAP, it also knows <em>what makes this segment
+                    unique</em> — e.g., "income is the #1 differentiator with SHAP value +0.8". This produces much more
+                targeted and insightful personas.</div>
+        </div>
+
+        <hr>
+
+        <!-- ============ STEP 7 ============ -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num" style="background:#E91E63;">7</div>
+                <h2>Interactive Dashboard <span>Unified Visualization Layer</span></h2>
+            </div>
+
+            <div class="two-col">
+                <div class="col-card">
+                    <h3 class="concept">💡 Conceptual — Why?</h3>
+                    <ul>
+                        <li>Stakeholders need a single place to explore segments, not scattered PNG files</li>
+                        <li>Interactivity (hover, filter, zoom) enables self-service exploration without data science
+                            involvement</li>
+                        <li>Combining cluster visualizations + persona cards in one view tells the complete story: "Who
+                            are these customers, and what should we do about them?"</li>
+                    </ul>
+                </div>
+                <div class="col-card">
+                    <h3 class="tech">⚙️ Technical — How?</h3>
+                    <ul>
+                        <li>Built with <code>plotly</code> for interactive charts, output as self-contained HTML</li>
+                        <li><strong>PCA scatter</strong> — 2D/3D projection colored by cluster</li>
+                        <li><strong>Cluster size bar chart</strong> — segment distribution</li>
+                        <li><strong>Violin plots</strong> — feature distributions per cluster</li>
+                        <li><strong>Radar charts</strong> — comparative cluster profiles</li>
+                        <li><strong>Persona cards</strong> — rendered as styled HTML cards with GenAI output</li>
+                        <li>Single <code>dashboard.html</code> file — no server needed, opens in any browser</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">Segmentation Plus — Detailed Technical Guide — v3.0 — March 2026</div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'dark', themeVariables: { primaryColor: '#2d3348', primaryTextColor: '#e8eaf0', primaryBorderColor: '#5b8def', lineColor: '#5b8def', secondaryColor: '#1e2233', tertiaryColor: '#252a3a', fontSize: '13px', fontFamily: 'Inter,sans-serif' }, flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }, sequence: { useMaxWidth: true, actorMargin: 60, messageMargin: 40 } });
+    </script>
+</body>
+
+</html>
