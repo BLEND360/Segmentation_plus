@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+import pandas as pd
 import yaml
 
 log = logging.getLogger("segplus.config")
@@ -49,14 +50,25 @@ class DomainConfig:
 
 
 def load_domain_config(domain_key: str, domains_dir: Path | None = None) -> DomainConfig:
-    """Load a domain configuration from YAML."""
+    """Load a domain configuration from YAML. Falls back to empty direct-ingest config if missing."""
     d = domains_dir or _DOMAINS_DIR
     yaml_path = d / f"{domain_key}.yaml"
     if not yaml_path.exists():
-        available = [f.stem for f in d.glob("*.yaml") if not f.stem.startswith("_")]
-        raise FileNotFoundError(
-            f"Domain '{domain_key}' not found at {yaml_path}. "
-            f"Available: {available}"
+        log.warning(
+            "Domain YAML '%s' not found. Falling back to direct-ingest config (no YAML rules).",
+            yaml_path,
+        )
+        return DomainConfig(
+            domain_key=domain_key,
+            display_name=domain_key.replace("_", " ").title(),
+            features={},
+            required_columns=[],
+            feature_engineering=[],
+            eda_analyses=[],
+            persona_prompt_template="",
+            scaling_exclude=[],
+            categorical_columns=[],
+            metadata={"source": "direct_no_yaml_fallback"},
         )
 
     with open(yaml_path, "r", encoding="utf-8") as f:
@@ -93,6 +105,46 @@ def load_domain_config(domain_key: str, domains_dir: Path | None = None) -> Doma
 def list_available_domains(domains_dir: Path | None = None) -> list[str]:
     d = domains_dir or _DOMAINS_DIR
     return sorted(f.stem for f in d.glob("*.yaml") if not f.stem.startswith("_"))
+
+
+def build_domain_config_from_dataframe(
+    df: pd.DataFrame,
+    domain_key: str = "direct_ingest",
+    exclude_cols: list[str] | None = None,
+) -> DomainConfig:
+    """
+    Build a DomainConfig directly from dataframe schema (no YAML dependency).
+    This is the recommended path when users provide only an Excel file.
+    """
+    excludes = set(c.lower() for c in (exclude_cols or []))
+    cols = [c for c in df.columns if c.lower() not in excludes]
+
+    categorical_cols: list[str] = []
+    for c in cols:
+        s = df[c]
+        n_unique = s.nunique(dropna=True)
+        ratio = n_unique / max(len(s), 1)
+        is_cat = (
+            pd.api.types.is_object_dtype(s)
+            or pd.api.types.is_categorical_dtype(s)
+            or pd.api.types.is_bool_dtype(s)
+            or (pd.api.types.is_numeric_dtype(s) and (n_unique <= 10 and ratio < 0.05))
+        )
+        if is_cat:
+            categorical_cols.append(c)
+
+    return DomainConfig(
+        domain_key=domain_key,
+        display_name=domain_key.replace("_", " ").title(),
+        features={"all": cols},
+        required_columns=[],
+        feature_engineering=[],
+        eda_analyses=[],
+        persona_prompt_template="",
+        scaling_exclude=[],
+        categorical_columns=categorical_cols,
+        metadata={"source": "direct_dataframe_schema"},
+    )
 
 
 # ── Pipeline Config ──────────────────────────────────────────────────────────
